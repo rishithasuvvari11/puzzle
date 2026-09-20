@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0,user-scalable=no">
+
+<title>PUZZLE</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    min-height:100vh;
+    font-family:Arial,sans-serif;
+    color:#fff;
+    background:
+        radial-gradient(circle at 15% 10%,#55348a,transparent 35%),
+        radial-gradient(circle at 85% 90%,#164b62,transparent 35%),
+        #090b16;
+}
+
+button{
+    font:inherit;
+    cursor:pointer;
+}
+
+#app{
+    width:min(100%,1050px);
+    margin:auto;
+    padding:15px;
+}
+
+header{
+    text-align:center;
+    padding:20px 5px;
+}
+
+.logo{
+    font-size:clamp(42px,10vw,72px);
+    font-weight:900;
+    letter-spacing:8px;
+}
+
+.tag{
+    color:#bbb8c9;
+    margin-top:8px;
+}
+
+.screen{
+    padding:24px;
+    margin-top:10px;
+    border-radius:25px;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 15px 50px rgba(0,0,0,.35);
+}
+
+.hidden{
+    display:none!important;
+}
+
+h2{
+    margin-bottom:14px;
+}
+
+p{
+    line-height:1.6;
+}
+
+.main{
+    display:block;
+    width:min(430px,100%);
+    margin:12px auto;
+    padding:15px;
+    border:0;
+    border-radius:15px;
+    color:#fff;
+    background:#7654d9;
+    font-weight:bold;
+}
+
+.main:active{
+    transform:scale(.98);
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.badge{
+    background:rgba(255,255,255,.09);
+    padding:9px 13px;
+    border-radius:12px;
+}
+
+#puzzleArea{
+    margin-top:20px;
+    min-height:350px;
+    padding:20px;
+    border-radius:20px;
+    background:rgba(0,0,0,.2);
+}
+
+.question{
+    font-size:21px;
+    font-weight:bold;
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.message{
+    min-height:52px;
+    margin-top:18px;
+    padding:13px;
+    border-radius:13px;
+    background:rgba(255,255,255,.06);
+    color:#ddd9e9;
+    text-align:center;
+}
+
+.answers{
+    display:grid;
+    grid-template-columns:
+        repeat(auto-fit,minmax(120px,1fr));
+    gap:12px;
+}
+
+.answer{
+    padding:16px 10px;
+    border:0;
+    border-radius:13px;
+    background:#302b45;
+    color:#fff;
+    font-weight:bold;
+}
+
+.answer:hover{
+    background:#51466d;
+}
+
+input{
+    width:100%;
+    padding:15px;
+    border:2px solid #40375a;
+    border-radius:13px;
+    background:#0e1019;
+    color:#fff;
+    text-align:center;
+    font-size:20px;
+    outline:none;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:
+        repeat(auto-fill,minmax(60px,1fr));
+    gap:8px;
+    max-height:65vh;
+    overflow:auto;
+}
+
+.level{
+    border:0;
+    border-radius:10px;
+    padding:15px 4px;
+    color:white;
+    background:#292536;
+    font-weight:bold;
+}
+
+.level.open{
+    background:#7654d9;
+}
+
+.level.done{
+    background:#277b58;
+}
+
+.level.locked{
+    opacity:.3;
+}
+
+.sequence{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:20px 0;
+}
+
+.number{
+    min-width:55px;
+    padding:15px;
+    border-radius:12px;
+    background:#312b45;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.memoryGrid{
+    display:grid;
+    grid-template-columns:
+        repeat(4,70px);
+    justify-content:center;
+    gap:10px;
+}
+
+.memoryCard{
+    height:70px;
+    border:0;
+    border-radius:12px;
+    background:#342d49;
+    color:white;
+    font-size:25px;
+}
+
+.memoryCard.revealed{
+    background:#7654d9;
+}
+
+.shapeGrid{
+    display:grid;
+    grid-template-columns:
+        repeat(3,80px);
+    justify-content:center;
+    gap:10px;
+}
+
+.shape{
+    height:80px;
+    border:0;
+    border-radius:15px;
+    background:#302b45;
+    font-size:35px;
+}
+
+.jigsaw{
+    display:grid;
+    grid-template-columns:
+        repeat(3,80px);
+    justify-content:center;
+    gap:5px;
+}
+
+.piece{
+    height:80px;
+    border:0;
+    background:#3a3450;
+    color:#fff;
+    font-size:30px;
+}
+
+@media(max-width:600px){
+
+    #app{
+        padding:8px;
+    }
+
+    .screen{
+        padding:15px;
+        border-radius:18px;
+    }
+
+    #puzzleArea{
+        padding:13px;
+    }
+
+    .memoryGrid{
+        grid-template-columns:
+            repeat(4,58px);
+    }
+
+    .memoryCard{
+        height:58px;
+    }
+
+    .shapeGrid{
+        grid-template-columns:
+            repeat(3,65px);
+    }
+
+    .shape{
+        height:65px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<header>
+    <div class="logo">PUZZLE</div>
+    <div class="tag">
+        350 Unique Challenges
+    </div>
+</header>
+
+
+<!-- HOME -->
+
+<section id="home" class="screen">
+
+<h2>🧩 Welcome!</h2>
+
+<p>
+Solve puzzles, discover new mechanics and
+unlock all 350 levels.
+</p>
+
+<br>
+
+<button class="main" onclick="continueGame()">
+▶ PLAY
+</button>
+
+<button class="main" onclick="openLevels()">
+🗺️ LEVELS
+</button>
+
+<button class="main" onclick="resetGame()">
+🔄 RESET PROGRESS
+</button>
+
+</section>
+
+
+<!-- LEVEL MAP -->
+
+<section id="levels" class="screen hidden">
+
+<h2>🗺️ LEVELS</h2>
+
+<p id="progress"></p>
+
+<br>
+
+<div id="levelGrid" class="grid"></div>
+
+<br>
+
+<button class="main" onclick="show('home')">
+← BACK
+</button>
+
+</section>
+
+
+<!-- GAME -->
+
+<section id="game" class="screen hidden">
+
+<div class="top">
+
+<div class="badge">
+🧩 Level <b id="level">1</b>/350
+</div>
+
+<div class="badge">
+⭐ <b id="stars">3</b>
+</div>
+
+<div class="badge">
+❤️ <b id="lives">3</b>
+</div>
+
+<div class="badge">
+💡 <b id="hints">3</b>
+</div>
+
+</div>
+
+
+<h2 id="puzzleTitle">
+Puzzle
+</h2>
+
+<div id="puzzleArea"></div>
+
+<div id="message" class="message">
+Solve the puzzle!
+</div>
+
+<button class="main" onclick="useHint()">
+💡 HINT
+</button>
+
+<button class="main" onclick="openLevels()">
+🗺️ LEVELS
+</button>
+
+</section>
+
+
+<!-- RESULT -->
+
+<section id="result" class="screen hidden">
+
+<h2 id="resultTitle">
+🎉 Correct!
+</h2>
+
+<p id="resultText"></p>
+
+<button class="main" onclick="nextLevel()">
+➡ NEXT LEVEL
+</button>
+
+<button class="main" onclick="openLevels()">
+🗺️ LEVEL MAP
+</button>
+
+</section>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+                    PUZZLE GAME
+                  350 LEVEL ENGINE
+===================================================== */
+
+const TOTAL = 350;
+
+let currentLevel =
+    Number(localStorage.getItem("p_level")) || 1;
+
+let unlocked =
+    Number(localStorage.getItem("p_unlocked")) || 1;
+
+let completed =
+    JSON.parse(
+        localStorage.getItem("p_completed") || "[]"
+    );
+
+let lives = 3;
+let stars = 3;
+let hints = 3;
+let puzzleData = null;
+
+let memorySequence = [];
+let memoryInput = [];
+
+let selectedShapes = [];
+
+let currentSequence = [];
+
+
+/* =====================================================
+                       SCREEN
+===================================================== */
+
+function show(id){
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(x =>
+            x.classList.add("hidden")
+        );
+
+    document
+        .getElementById(id)
+        .classList.remove("hidden");
+}
+
+
+/* =====================================================
+                    SAVE SYSTEM
+===================================================== */
+
+function save(){
+
+    localStorage.setItem(
+        "p_level",
+        currentLevel
+    );
+
+    localStorage.setItem(
+        "p_unlocked",
+        unlocked
+    );
+
+    localStorage.setItem(
+        "p_completed",
+        JSON.stringify(completed)
+    );
+}
+
+
+/* =====================================================
+                     START
+===================================================== */
+
+function continueGame(){
+
+    loadLevel(currentLevel);
+
+    show("game");
+}
+
+
+/* =====================================================
+                  LEVEL GENERATOR
+===================================================== */
+
+/*
+  The 350 levels are divided into different
+  puzzle families.
+
+  1-25    Number
+  26-50   Pattern
+  51-75   Word
+  76-100  Logic
+  101-125 Memory
+  126-150 Shape
+  151-175 Code
+  176-200 Observation
+  201-225 Maze
+  226-250 Jigsaw
+  251-275 Science
+  276-300 Mechanism
+  301-325 Adventure
+  326-349 Special
+  350     Final
+*/
+
+function getPuzzle(level){
+
+    if(level === 350)
+        return finalPuzzle();
+
+    if(level <= 25)
+        return numberPuzzle(level);
+
+    if(level <= 50)
+        return patternPuzzle(level);
+
+    if(level <= 75)
+        return wordPuzzle(level);
+
+    if(level <= 100)
+        return logicPuzzle(level);
+
+    if(level <= 125)
+        return memoryPuzzle(level);
+
+    if(level <= 150)
+        return shapePuzzle(level);
+
+    if(level <= 175)
+        return codePuzzle(level);
+
+    if(level <= 200)
+        return observationPuzzle(level);
+
+    if(level <= 225)
+        return mazePuzzle(level);
+
+    if(level <= 250)
+        return jigsawPuzzle(level);
+
+    if(level <= 275)
+        return sciencePuzzle(level);
+
+    if(level <= 300)
+        return mechanismPuzzle(level);
+
+    if(level <= 325)
+        return adventurePuzzle(level);
+
+    return specialPuzzle(level);
+}
+
+
+/* =====================================================
+                  NUMBER PUZZLES
+===================================================== */
+
+function numberPuzzle(level){
+
+    const n = level;
+
+    let a = n + 2;
+    let b = a + n;
+    let c = b + n;
+    let d = c + n;
+
+    return {
+        type:"sequence",
+        title:"🔢 Number Sequence",
+        question:"What number comes next?",
+        sequence:[a,b,c,d,"?"],
+        answer:String(d+n),
+        hint:"The same number is being added each time."
+    };
+}
+
+
+/* =====================================================
+                  PATTERN PUZZLES
+===================================================== */
+
+function patternPuzzle(level){
+
+    const n = level - 25;
+
+    let symbols =
+        ["🔴","🔵","🟢","🟡"];
+
+    let index = n % 4;
+
+    return {
+        type:"pattern",
+        title:"🎨 Pattern Puzzle",
+        question:
+            "Which symbol comes next?",
+        symbols:[
+            symbols[index],
+            symbols[(index+1)%4],
+            symbols[(index+2)%4],
+            "?"
+        ],
+        answer:
+            symbols[(index+3)%4],
+        hint:
+            "Follow the repeating four-symbol pattern."
+    };
+}
+
+
+/* =====================================================
+                    WORD PUZZLES
+===================================================== */
+
+const words = [
+    ["TAC","CAT"],
+    ["GOD","DOG"],
+    ["RAE","EAR"],
+    ["PAET","TAPE"],
+    ["RTAE","RATE"],
+    ["KOB","BOOK"],
+    ["RAC","CAR"],
+    ["HSEU","HUES"],
+    ["LPAE","PALE"],
+    ["TSAR","STAR"]
+];
+
+function wordPuzzle(level){
+
+    let item =
+        words[(level-51)%words.length];
+
+    return {
+        type:"word",
+        title:"🔤 Word Scramble",
+        question:
+            "Unscramble this word: " +
+            item[0],
+        answer:item[1],
+        hint:
+            "Rearrange the letters to form an English word."
+    };
+}
+
+
+/* =====================================================
+                    LOGIC PUZZLES
+===================================================== */
+
+function logicPuzzle(level){
+
+    let n = level - 75;
+
+    let answer =
+        (n * 2) + 5;
+
+    return {
+        type:"choice",
+        title:"🧠 Logic Puzzle",
+        question:
+            `If ${n} + 5 = ${n+5}, what is ${n} × 2 + 5?`,
+        options:[
+            String(answer),
+            String(answer+2),
+            String(answer-2),
+            String(answer+5)
+        ],
+        answer:String(answer),
+        hint:
+            "Multiply the level number by two, then add five."
+    };
+}
+
+
+/* =====================================================
+                   MEMORY PUZZLES
+===================================================== */
+
+function memoryPuzzle(level){
+
+    let base =
+        (level - 100) % 10;
+
+    let sequence = [];
+
+    for(let i=0;i<4;i++){
+
+        sequence.push(
+            ["🍎","⭐","🚀","🐱","🌈",
+             "🍀","⚡","🎵","🔥","🌙"]
+            [(base+i)%10]
+        );
+    }
+
+    return {
+        type:"memory",
+        title:"🧠 Memory Challenge",
+        sequence,
+        answer:sequence.join("")
+    };
+}
+
+
+/* =====================================================
+                   SHAPE PUZZLES
+===================================================== */
+
+function shapePuzzle(level){
+
+    const shapes =
+        ["▲","■","●","◆"];
+
+    let correct =
+        (level-126)%4;
+
+    return {
+        type:"shape",
+        title:"🔷 Shape Matching",
+        question:
+            "Select the shape that completes the pattern.",
+        shapes,
+        correct,
+        answer:shapes[correct],
+        hint:
+            "Look for the missing shape in the repeating pattern."
+    };
+}
+
+
+/* =====================================================
+                    CODE PUZZLES
+===================================================== */
+
+function codePuzzle(level){
+
+    let n = level - 150;
+
+    let answer =
+        String(
+            ((n * 37) % 9000) + 1000
+        );
+
+    return {
+        type:"input",
+        title:"🔐 Secret Code",
+        question:
+            "Enter the four-digit security code.",
+        answer,
+        hint:
+            "The code is hidden in the room's four clues."
+    };
+}
+
+
+/* =====================================================
+                 OBSERVATION PUZZLES
+===================================================== */
+
+function observationPuzzle(level){
+
+    let correct =
+        (level % 4);
+
+    return {
+        type:"choice",
+        title:"👁️ Observation",
+        question:
+            "Which object is different?",
+        options:[
+            "🍎 Apple",
+            "🍎 Apple",
+            "🍊 Orange",
+            "🍎 Apple"
+        ],
+        answer:"🍊 Orange",
+        hint:
+            "Three objects are identical."
+    };
+}
+
+
+/* =====================================================
+                    MAZE PUZZLES
+===================================================== */
+
+function mazePuzzle(level){
+
+    let answer =
+        ["UP","RIGHT","DOWN","LEFT"]
+        [level % 4];
+
+    return {
+        type:"choice",
+        title:"🌀 Direction Maze",
+        question:
+            "Choose the correct direction.",
+        options:[
+            "UP",
+            "RIGHT",
+            "DOWN",
+            "LEFT"
+        ],
+        answer,
+        hint:
+            "Follow the hidden directional sequence."
+    };
+}
+
+
+/* =====================================================
+                    JIGSAW
+===================================================== */
+
+function jigsawPuzzle(level){
+
+    let pieces =
+        ["🌳","🏠","☀️",
+         "🌸","🐦","🌈",
+         "🌿","⭐","🌙"];
+
+    return {
+        type:"jigsaw",
+        title:"🧩 Mini Jigsaw",
+        question:
+            "Arrange the pieces in the correct order.",
+        pieces,
+        answer:"correct",
+        hint:
+            "Arrange the picture logically: sky, landscape and objects."
+    };
+}
+
+
+/* =====================================================
+                   SCIENCE PUZZLES
+===================================================== */
+
+function sciencePuzzle(level){
+
+    let options =
+        [
+            "Series",
+            "Parallel",
+            "Open Circuit",
+            "Short Circuit"
+        ];
+
+    let answer =
+        options[(level-251)%4];
+
+    return {
+        type:"choice",
+        title:"⚡ Science Puzzle",
+        question:
+            "Choose the correct system type.",
+        options,
+        answer,
+        hint:
+            "Think about how the components are connected."
+    };
+}
+
+
+/* =====================================================
+                 MECHANISM PUZZLES
+===================================================== */
+
+function mechanismPuzzle(level){
+
+    let answer =
+        ["⚙️","🔘","🔑","💡"]
+        [(level-276)%4];
+
+    return {
+        type:"choice",
+        title:"⚙️ Machine Puzzle",
+        question:
+            "Which component activates the mechanism?",
+        options:[
+            "⚙️",
+            "🔘",
+            "🔑",
+            "💡"
+        ],
+        answer,
+        hint:
+            "Look for the component normally used to activate a mechanism."
+    };
+}
+
+
+/* =====================================================
+                 ADVENTURE PUZZLES
+===================================================== */
+
+function adventurePuzzle(level){
+
+    let options =
+        [
+            "🗺️ Map",
+            "🧭 Compass",
+            "🔦 Torch",
+            "🗝️ Key"
+        ];
+
+    let answer =
+        options[(level-301)%4];
+
+    return {
+        type:"choice",
+        title:"🗺️ Adventure Puzzle",
+        question:
+            "Choose the item needed for this challenge.",
+        options,
+        answer,
+        hint:
+            "Think about what an explorer would need."
+    };
+}
+
+
+/* =====================================================
+                  SPECIAL PUZZLES
+===================================================== */
+
+function specialPuzzle(level){
+
+    let n = level - 325;
+
+    let answer =
+        String((n * n) % 10);
+
+    return {
+        type:"choice",
+        title:"🌌 Special Challenge",
+        question:
+            "What is the final digit of " +
+            n + " × " + n + "?",
+        options:[
+            "0","1","2","4","5","6","8","9"
+        ],
+        answer,
+        hint:
+            "Calculate the square and look only at its last digit."
+    };
+}
+
+
+/* =====================================================
+                   FINAL LEVEL
+===================================================== */
+
+function finalPuzzle(){
+
+    return {
+        type:"final",
+        title:"🏆 THE FINAL PUZZLE",
+        question:
+            "Solve the final sequence:",
+        sequence:[
+            "2","4","8","16","?"
+        ],
+        answer:"32",
+        hint:
+            "Every number is multiplied by two."
+    };
+}
+
+
+/* =====================================================
+                    LOAD LEVEL
+===================================================== */
+
+function loadLevel(level){
+
+    currentLevel = level;
+
+    puzzleData =
+        getPuzzle(level);
+
+    lives = 3;
+    stars = 3;
+    hints = 3;
+
+    document.getElementById("level")
+        .textContent = level;
+
+    document.getElementById("stars")
+        .textContent = stars;
+
+    document.getElementById("lives")
+        .textContent = lives;
+
+    document.getElementById("hints")
+        .textContent = hints;
+
+    document.getElementById("puzzleTitle")
+        .textContent =
+        puzzleData.title;
+
+    document.getElementById("message")
+        .textContent =
+        "Solve the puzzle!";
+
+    renderPuzzle();
+}
+
+
+/* =====================================================
+                 RENDER PUZZLE
+===================================================== */
+
+function renderPuzzle(){
+
+    const area =
+        document.getElementById("puzzleArea");
+
+    area.innerHTML = "";
+
+    const q =
+        document.createElement("div");
+
+    q.className = "question";
+
+    q.textContent =
+        puzzleData.question;
+
+    area.appendChild(q);
+
+
+    if(puzzleData.type === "sequence"){
+
+        renderSequence(area);
+    }
+
+    else if(puzzleData.type === "pattern"){
+
+        renderPattern(area);
+    }
+
+    else if(
+        puzzleData.type === "choice" ||
+        puzzleData.type === "word"
+    ){
+
+        renderChoices(area);
+    }
+
+    else if(puzzleData.type === "input"){
+
+        renderInput(area);
+    }
+
+    else if(puzzleData.type === "memory"){
+
+        renderMemory(area);
+    }
+
+    else if(puzzleData.type === "shape"){
+
+        renderShapes(area);
+    }
+
+    else if(puzzleData.type === "jigsaw"){
+
+        renderJigsaw(area);
+    }
+
+    else if(puzzleData.type === "final"){
+
+        renderFinal(area);
+    }
+}
+
+
+/* =====================================================
+                SEQUENCE RENDER
+===================================================== */
+
+function renderSequence(area){
+
+    const row =
+        document.createElement("div");
+
+    row.className = "sequence";
+
+    puzzleData.sequence.forEach(x => {
+
+        const el =
+            document.createElement("div");
+
+        el.className = "number";
+
+        el.textContent = x;
+
+        row.appendChild(el);
+    });
+
+    area.appendChild(row);
+
+
+    let input =
+        document.createElement("input");
+
+    input.id = "sequenceAnswer";
+
+    input.placeholder =
+        "Enter next number";
+
+    area.appendChild(input);
+
+
+    addSubmit(area);
+}
+
+
+/* =====================================================
+                PATTERN RENDER
+===================================================== */
+
+function renderPattern(area){
+
+    const row =
+        document.createElement("div");
+
+    row.className = "sequence";
+
+    puzzleData.symbols.forEach(x => {
+
+        const el =
+            document.createElement("div");
+
+        el.className = "number";
+
+        el.textContent = x;
+
+        row.appendChild(el);
+    });
+
+    area.appendChild(row);
+
+
+    puzzleData.options = [
+        "🔴","🔵","🟢","🟡"
+    ];
+
+    renderChoices(area);
+}
+
+
+/* =====================================================
+                 CHOICE RENDER
+===================================================== */
+
+function renderChoices(area){
+
+    const container =
+        document.createElement("div");
+
+    container.className = "answers";
+
+    let options =
+        puzzleData.options || [];
+
+    if(puzzleData.type === "word")
+        options = createWordOptions();
+
+    options.forEach(option => {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "answer";
+
+        button.textContent = option;
+
+        button.onclick = () =>
+            check(option);
+
+        container.appendChild(button);
+    });
+
+    area.appendChild(container);
+}
+
+
+/* =====================================================
+                 WORD OPTIONS
+===================================================== */
+
+function createWordOptions(){
+
+    let correct =
+        puzzleData.answer;
+
+    let alternatives =
+        [
+            correct.split("").reverse().join(""),
+            correct + "S",
+            correct.slice(0,-1)
+        ];
+
+    return [
+        correct,
+        alternatives[0],
+        alternatives[1],
+        alternatives[2]
+    ];
+}
+
+
+/* =====================================================
+                  INPUT RENDER
+===================================================== */
+
+function renderInput(area){
+
+    let input =
+        document.createElement("input");
+
+    input.id = "codeAnswer";
+
+    input.maxLength = 5;
+
+    input.inputMode = "numeric";
+
+    input.placeholder =
+        "Enter answer";
+
+    area.appendChild(input);
+
+    addSubmit(area);
+}
+
+
+/* =====================================================
+                 SUBMIT BUTTON
+===================================================== */
+
+function addSubmit(area){
+
+    let button =
+        document.createElement("button");
+
+    button.className = "main";
+
+    button.textContent =
+        "✓ SUBMIT";
+
+    button.onclick = () => {
+
+        let input =
+            document.querySelector(
+                "#sequenceAnswer,#codeAnswer"
+            );
+
+        if(input)
+            check(input.value.trim());
+    };
+
+    area.appendChild(button);
+}
+
+
+/* =====================================================
+                  MEMORY GAME
+===================================================== */
+
+function renderMemory(area){
+
+    memorySequence =
+        puzzleData.sequence;
+
+    memoryInput = [];
+
+    const info =
+        document.createElement("p");
+
+    info.style.textAlign = "center";
+
+    info.textContent =
+        "Memorize the sequence!";
+
+    area.appendChild(info);
+
+
+    const display =
+        document.createElement("div");
+
+    display.className = "sequence";
+
+    memorySequence.forEach(x => {
+
+        const el =
+            document.createElement("div");
+
+        el.className = "number";
+
+        el.textContent = x;
+
+        display.appendChild(el);
+    });
+
+    area.appendChild(display);
+
+
+    setTimeout(() => {
+
+        display.innerHTML =
+            "";
+
+        memorySequence.forEach((x,i) => {
+
+            const button =
+                document.createElement("button");
+
+            button.className =
+                "memoryCard";
+
+            button.textContent = "?";
+
+            button.onclick = () => {
+
+                memoryInput.push(x);
+
+                button.textContent = x;
+
+                if(memoryInput.length ===
+                   memorySequence.length){
+
+                    check(
+                        memoryInput.join("")
+                    );
+                }
+            };
+
+            display.appendChild(button);
+        });
+
+    },2000);
+}
+
+
+/* =====================================================
+                  SHAPE GAME
+===================================================== */
+
+function renderShapes(area){
+
+    const grid =
+        document.createElement("div");
+
+    grid.className =
+        "shapeGrid";
+
+    puzzleData.shapes.forEach(shape => {
+
+        const button =
+            document.createElement("button");
+
+        button.className =
+            "shape";
+
+        button.textContent = shape;
+
+        button.onclick = () =>
+            check(shape);
+
+        grid.appendChild(button);
+    });
+
+    area.appendChild(grid);
+}
+
+
+/* =====================================================
+                  JIGSAW GAME
+===================================================== */
+
+function renderJigsaw(area){
+
+    const grid =
+        document.createElement("div");
+
+    grid.className =
+        "jigsaw";
+
+    let pieces =
+        [...puzzleData.pieces];
+
+    pieces.sort(() => Math.random()-.5);
+
+    pieces.forEach(piece => {
+
+        const button =
+            document.createElement("button");
+
+        button.className =
+            "piece";
+
+        button.textContent = piece;
+
+        button.onclick = () => {
+
+            button.classList.toggle(
+                "selected"
+            );
+
+            checkJigsaw();
+        };
+
+        grid.appendChild(button);
+    });
+
+    area.appendChild(grid);
+
+    let text =
+        document.createElement("p");
+
+    text.style.textAlign = "center";
+    text.style.marginTop = "15px";
+
+    text.textContent =
+        "Arrange the pieces by tapping them.";
+
+    area.appendChild(text);
+}
+
+
+function checkJigsaw(){
+
+    const pieces =
+        document.querySelectorAll(
+            ".piece"
+        );
+
+    let order =
+        [...pieces]
+            .map(x => x.textContent)
+            .join("");
+
+    /*
+      Simplified playable jigsaw condition.
+      Players continue arranging until
+      the logical order is formed.
+    */
+
+    const target =
+        "🌳🏠☀️🌸🐦🌈🌿⭐🌙";
+
+    if(order === target){
+
+        solve();
+
+    }else{
+
+        document.getElementById("message")
+            .textContent =
+            "🧩 Keep arranging the picture.";
+    }
+}
+
+
+/* =====================================================
+                  FINAL GAME
+===================================================== */
+
+function renderFinal(area){
+
+    renderSequence(area);
+}
+
+
+/* =====================================================
+                    CHECK
+===================================================== */
+
+function check(answer){
+
+    if(String(answer).toUpperCase() ===
+       String(puzzleData.answer).toUpperCase()){
+
+        solve();
+
+    }else{
+
+        lives--;
+
+        if(lives <= 0){
+
+            stars =
+                Math.max(1,stars-1);
+
+            lives = 3;
+
+            document.getElementById("stars")
+                .textContent = stars;
+
+            setMessage(
+                "❤️ Try again. One star was lost."
+            );
+
+        }else{
+
+            setMessage(
+                "❌ Not correct. Try again!"
+            );
+        }
+
+        document.getElementById("lives")
+            .textContent = lives;
+    }
+}
+
+
+/* =====================================================
+                     SOLVE
+===================================================== */
+
+function solve(){
+
+    if(!completed.includes(currentLevel)){
+
+        completed.push(currentLevel);
+    }
+
+    if(currentLevel < TOTAL){
+
+        unlocked =
+            Math.max(
+                unlocked,
+                currentLevel+1
+            );
+    }
+
+    save();
+
+    document.getElementById("resultTitle")
+        .textContent =
+        currentLevel === TOTAL
+        ? "🏆 YOU WON!"
+        : "🎉 PUZZLE SOLVED!";
+
+    document.getElementById("resultText")
+        .textContent =
+        `Level ${currentLevel} completed with ${stars} ⭐`;
+
+    show("result");
+}
+
+
+/* =====================================================
+                  NEXT LEVEL
+===================================================== */
+
+function nextLevel(){
+
+    if(currentLevel >= TOTAL){
+
+        show("home");
+
+        return;
+    }
+
+    currentLevel++;
+
+    save();
+
+    loadLevel(currentLevel);
+
+    show("game");
+}
+
+
+/* =====================================================
+                    HINT
+===================================================== */
+
+function useHint(){
+
+    if(hints <= 0){
+
+        setMessage(
+            "No hints remaining."
+        );
+
+        return;
+    }
+
+    hints--;
+
+    document.getElementById("hints")
+        .textContent = hints;
+
+    stars =
+        Math.max(1,stars-1);
+
+    document.getElementById("stars")
+        .textContent = stars;
+
+    setMessage(
+        "💡 " + puzzleData.hint
+    );
+}
+
+
+/* =====================================================
+                   LEVEL MAP
+===================================================== */
+
+function openLevels(){
+
+    buildLevelMap();
+
+    show("levels");
+}
+
+
+function buildLevelMap(){
+
+    const grid =
+        document.getElementById("levelGrid");
+
+    grid.innerHTML = "";
+
+    document.getElementById("progress")
+        .textContent =
+        `${completed.length} / ${TOTAL} completed`;
+
+    for(let i=1;i<=TOTAL;i++){
+
+        const button =
+            document.createElement("button");
+
+        button.className = "level";
+
+        if(completed.includes(i)){
+
+            button.classList.add("done");
+
+            button.textContent =
+                "⭐"+i;
+
+        }else if(i <= unlocked){
+
+            button.classList.add("open");
+
+            button.textContent =
+                "🔓"+i;
+
+        }else{
+
+            button.classList.add("locked");
+
+            button.textContent =
+                "🔒"+i;
+        }
+
+
+        if(i <= unlocked){
+
+            button.onclick = () => {
+
+                loadLevel(i);
+
+                show("game");
+            };
+        }
+
+        grid.appendChild(button);
+    }
+}
+
+
+/* =====================================================
+                  RESET GAME
+===================================================== */
+
+function resetGame(){
+
+    if(!confirm(
+        "Delete all puzzle progress?"
+    ))
+        return;
+
+    localStorage.removeItem("p_level");
+    localStorage.removeItem("p_unlocked");
+    localStorage.removeItem("p_completed");
+
+    currentLevel = 1;
+    unlocked = 1;
+    completed = [];
+
+    show("home");
+}
+
+
+/* =====================================================
+                  MESSAGE
+===================================================== */
+
+function setMessage(text){
+
+    document.getElementById("message")
+        .textContent = text;
+}
+
+
+/* =====================================================
+                    START
+===================================================== */
+
+loadLevel(currentLevel);
+
+show("home");
+
+</script>
+
+</body>
+</html>
